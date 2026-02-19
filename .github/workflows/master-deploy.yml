@@ -1,0 +1,56 @@
+name: Master Deployment
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Backend Deploy
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'Car-Pooling-System',
+              repo: 'Car-Pooling-System-Backend',
+              workflow_id: 'ci-cd.yml',
+              ref: 'main'
+            })
+      - name: Wait for Backend Health
+        run: |
+          sleep 60
+          curl -f https://backend.railway.app/health
+
+  deploy-web:
+    needs: deploy-backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Web Deploy
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'Car-Pooling-System',
+              repo: 'Car-Pooling-System-Web-Frontend',
+              workflow_id: 'ci-cd.yml',
+              ref: 'main'
+            })
+
+  deploy-mobile:
+    needs: deploy-web
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Mobile Build
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'Car-Pooling-System',
+              repo: 'Car-Pooling-System-Mobile-Frontend',
+              workflow_id: 'ci-cd.yml',
+              ref: 'main'
+            })
