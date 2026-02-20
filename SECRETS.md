@@ -5,37 +5,48 @@ To enable the full CI/CD pipeline, you must configure GitHub Secrets in each rep
 ---
 
 ## 1. Orchestrator Repo (`carpooling-deployment`)
-**Critical for cross-repo triggers:**
-- `GH_PAT`: A GitHub **Personal Access Token** (Classic).
-  - **Required Scopes**: `repo`, `workflow`.
-  - **Why?**: This token allows the Orchestrator to trigger the CI/CD workflows in your Backend, Web, and Mobile repos.
-  - **Error Fix**: If you see `Bad credentials`, your token is either expired or missing the `workflow` scope.
+### `GH_PAT` (GitHub Personal Access Token)
+- **Where to get it**: [GitHub Settings > Developer Settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens/new).
+- **Settings**:
+  - **Note**: "Carpooling Orchestrator Token"
+  - **Expiration**: 30 or 90 days (your choice).
+  - **Scopes (CRITICAL)**: Select **`repo`** (all) and **`workflow`**.
+- **Usage**: Paste the generated string (starts with `ghp_...`) into the `GH_PAT` secret in your `carpooling-deployment` repo.
 
 ---
 
 ## 2. Backend Repo (`Car-Pooling-System-Backend`)
-- `JWT_SECRET`: Secret key for signing authentication tokens.
-- `MONGODB_URI`: (Optional) If you want integration tests to run against a real database instead of the Docker service.
+### `JWT_SECRET`
+- **Where to get it**: This is an arbitrary secret key created by you.
+- **How to generate**: Open your terminal and run:
+  ```bash
+  node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  ```
+- **Usage**: Copy the output string and add it as `JWT_SECRET` in the Backend repo's secrets.
 
 ---
 
 ## 3. Web Repo (`Car-Pooling-System-Web-Frontend`)
-- `VERCEL_TOKEN`: Required if you use the Vercel CLI for deployment.
-- `VERCEL_ORG_ID`: Required for Vercel CLI.
-- `VERCEL_PROJECT_ID`: Required for Vercel CLI.
-- *Note*: If you linked Vercel to GitHub directly, these might not be needed for basic auto-deploy, but are good for advanced control.
+### `VERCEL_TOKEN`
+- **Where to get it**: [Vercel Dashboard > Settings > Access Tokens](https://vercel.com/account/tokens).
+- **Usage**: Create a token and add it as `VERCEL_TOKEN` in the Web repo's secrets.
+- *Note*: You also need `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` found in your project's `Settings > General` on Vercel.
 
 ---
 
 ## 4. Mobile Repo (`Car-Pooling-System-Mobile-Frontend`)
-- `EXPO_TOKEN`: **Mandatory**. Your Expo Access Token.
-  - **Creation**: [Expo Dashboard > Access Tokens](https://expo.dev/settings/access-tokens).
-  - **Why?**: Allows GitHub to build and publish your app to Expo.
+### `EXPO_TOKEN`
+- **Where to get it**: [Expo Dashboard > User Settings > Access Tokens](https://expo.dev/settings/access-tokens).
+- **Usage**: Create a new token and add it as `EXPO_TOKEN` in the Mobile repo's secrets.
 
 ---
 
-## 💡 How Workflows Interact
-1. **Orchestrator** triggers child workflows via GitHub API (using `GH_PAT`).
-2. **Child Workflow** runs locally in its repo (lint, test, build).
-3. **Child Workflow** deploys to its provider (Railway, Vercel, Expo) using its own secrets.
+## 💡 Summary Checklist
+| Repository | Secret Name | Source |
+| :--- | :--- | :--- |
+| **deployment** | `GH_PAT` | GitHub Developer Settings |
+| **backend** | `JWT_SECRET` | Terminal (Random string) |
+| **web** | `VERCEL_TOKEN` | Vercel Settings |
+| **mobile** | `EXPO_TOKEN` | Expo Dashboard |
+
 
