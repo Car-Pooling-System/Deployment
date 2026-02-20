@@ -8,7 +8,7 @@ describe('System Integration Tests', () => {
     test('Backend API should be healthy', async () => {
         const response = await axios.get(`${BACKEND_URL}/health`);
         expect(response.status).toBe(200);
-        expect(response.data.status).toBe('UP');
+        expect(response.data.message).toBe('Server is running');
     });
 
     test('Web Frontend should be reachable', async () => {

@@ -41,8 +41,8 @@ jobs:
 
       - name: Verify Backend Health
         run: |
-          # Replace with actual health check script or curl
-          curl -f https://backend.railway.app/health || exit 1
+          URL="${{ inputs.environment == 'production' && 'https://backend.railway.app' || 'https://backend-staging.railway.app' }}"
+          curl -f "$URL/health" || exit 1
 
   # 2. Deploy Web Frontend (Depends on Backend)
   deploy-web:
@@ -99,5 +99,5 @@ jobs:
       - name: Run Integration Suite
         run: npm run test:integration
         env:
-          API_URL: https://backend.railway.app
-          WEB_URL: https://carpooling.vercel.app
+          API_URL: ${{ inputs.environment == 'production' && 'https://backend.railway.app' || 'https://backend-staging.railway.app' }}
+          WEB_URL: ${{ inputs.environment == 'production' && 'https://carpooling.vercel.app' || 'https://carpooling-staging.vercel.app' }}
