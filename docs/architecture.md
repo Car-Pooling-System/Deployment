@@ -1,32 +1,56 @@
 # System Architecture
 
 ## Overview
-The Carpooling System relies on a microservices-inspired architecture where the frontend clients consume a centralized REST API.
+The Car Pooling System is designed as a microservices-based application, orchestrated by this central repository. It consists of a Node.js backend, a React web frontend, and a React Native mobile application.
+
+## Components
+
+### 1. Backend Service (`carpooling-backend`)
+- **Role**: Core API, Business Logic, Data Persistence
+- **Technology**: Node.js, Express, MongoDB
+- **Hosting**: Railway
+- **Key Features**:
+  - Authentication (JWT)
+  - Ride Management
+  - User Profiles
+  - Booking System
+
+### 2. Web Frontend (`carpooling-frontend-web`)
+- **Role**: Admin Dashboard, User Web Interface
+- **Technology**: React, Vite
+- **Hosting**: Vercel
+- **Key Features**:
+  - Responsive Design
+  - Admin Controls
+  - Ride Booking UI
+
+### 3. Mobile Frontend (`carpooling-frontend-mobile`)
+- **Role**: Primary User Interface for Riders/Drivers
+- **Technology**: React Native, Expo
+- **Hosting**: Expo EAS
+- **Key Features**:
+  - Real-time location (planned)
+  - Push Notifications
+  - Mobile-optimized flows
+
+## Data Flow
 
 ```mermaid
 graph TD
-    User[User] --> Web[Web Frontend (Vercel)]
-    User --> Mobile[Mobile App (Expo)]
+    User[User (Mobile/Web)] -->|HTTP/REST| Web[Web Frontend]
+    User -->|HTTP/REST| Mobile[Mobile App]
+    Web -->|API Calls| Backend[Backend API]
+    Mobile -->|API Calls| Backend
+    Backend -->|Read/Write| DB[(MongoDB)]
     
-    Web --> API[Backend API (Railway)]
-    Mobile --> API
-    
-    API --> DB[(MongoDB Atlas)]
-    API --> Maps[Google Maps API]
-    API --> Twilio[Twilio SMS]
+    subgraph "Deployment Pipeline"
+        Orchestrator[Deployment Repo] -->|Trigger| Backend
+        Backend -->|Success| Web
+        Web -->|Success| Mobile
+    end
 ```
 
-## detailed Components
-
-### Backend
-- **Tech**: Node.js, Express
-- **Database**: MongoDB (Mongoose)
-- **Role**: Auth, ride matching, booking logic.
-
-### Web Frontend
-- **Tech**: React, Vite
-- **Role**: Admin dashboard, desktop rider/driver interface.
-
-### Mobile Frontend
-- **Tech**: React Native, Expo
-- **Role**: Primary driver/rider interface, GPS tracking.
+## Infrastructure
+- **Version Control**: GitHub (Monorepo-style orchestration with separate repos)
+- **CI/CD**: GitHub Actions
+- **Database**: MongoDB Atlas (or self-hosted on Railway)

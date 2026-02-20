@@ -1,29 +1,38 @@
 # Deployment Guide
 
-## Automated Deployment
-The `carpooling-deployment` repo triggers deployments via GitHub Actions.
+This guide outlines the steps to deploy the entire Car Pooling System.
 
-### Steps
-1.  **Commit Changes**: Push code to `main` branch of any service repo.
-2.  **Trigger Master Deploy**:
-    - Go to `carpooling-deployment` Actions tab.
-    - Select "Master Deployment".
-    - Click "Run workflow".
-3.  **Monitor**: Use the visualization graph to see Backend -> Web -> Mobile deployment stages.
+## Prerequisites
+- GitHub Personal Access Token (`GH_PAT`) configured in this repository secrets.
+- `EXPO_TOKEN` configured in the Mobile repository secrets.
+- Hosting accounts (Railway, Vercel) linked to the respective repositories.
 
-## Manual Deployment
+## Triggering a Deployment
 
-### Backend
-1.  Check `package.json` scripts.
-2.  Run `npm run build` (if applicable).
-3.  Deploy using Railway CLI: `railway up`.
+### Option 1: Manual Trigger (GitHub UI)
+1. Go to the **Actions** tab in this repository.
+2. Select **Master Deployment Pipeline** from the left sidebar.
+3. Click **Run workflow**.
+4. Select the environment (Staging/Production).
+5. Click **Run workflow**.
 
-### Web Frontend
-1.  Check `package.json` scripts.
-2.  Run `npm run build`.
-3.  Deploy using Vercel CLI: `vercel --prod`.
+### Option 2: CLI Trigger
+You can use the provided script to trigger a deployment from your local machine:
 
-### Mobile Frontend
-1.  Check `eas.json`.
-2.  Run `eas build --platform all`.
-3.  Submit to stores via EAS Submit.
+```bash
+./scripts/deploy-all.sh
+```
+
+## Deployment Flow
+1. **Backend Deploy**: 
+   - Triggers `ci-cd.yml` in `carpooling-backend`.
+   - Waits for the `/health` endpoint to return 200 OK.
+2. **Web Frontend Deploy**: 
+   - Triggered only if Backend deploy succeeds.
+   - Deploys to Vercel.
+3. **Mobile App Deploy**:
+   - Triggered only if Web deploy succeeds.
+   - Publishes OTA update via Expo.
+
+## Verification
+After deployment, the `health-check.yml` workflow runs automatically (or can be triggered manually) to verify all services are up.

@@ -1,0 +1,26 @@
+environment_variables:
+  global:
+    GH_PAT:
+      description: "GitHub Personal Access Token for triggering cross-repo workflows"
+      required: true
+      scope: "repo, workflow"
+
+  backend:
+    MONGODB_URI:
+      description: "Connection string for MongoDB"
+    JWT_SECRET:
+      description: "Secret key for signing tokens"
+    PORT:
+      description: "Server port (default: 5000)"
+
+  frontend_web:
+    REACT_APP_API_URL:
+      description: "URL of the backend API"
+    REACT_APP_ENV:
+      description: "Current environment (staging/production)"
+
+  frontend_mobile:
+    EXPO_TOKEN:
+      description: "Expo Access Token for publishing"
+    API_URL:
+      description: "Backend API URL for mobile app"

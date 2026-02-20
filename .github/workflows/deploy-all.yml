@@ -1,0 +1,103 @@
+name: Master Deployment Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip Integration Tests'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  # 1. Deploy Backend
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Backend Workflow
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'Car-Pooling-System',
+              repo: 'Car-Pooling-System-Backend',
+              workflow_id: 'ci-cd.yml',
+              ref: 'main',
+              inputs: { environment: '${{ inputs.environment }}' }
+            })
+      
+      - name: Wait for Deployment
+        run: sleep 60  # Basic wait, ideally use a polling script
+
+      - name: Verify Backend Health
+        run: |
+          # Replace with actual health check script or curl
+          curl -f https://backend.railway.app/health || exit 1
+
+  # 2. Deploy Web Frontend (Depends on Backend)
+  deploy-web:
+    needs: deploy-backend
+    name: Deploy Web Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Web Workflow
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'Car-Pooling-System',
+              repo: 'Car-Pooling-System-Web-Frontend',
+              workflow_id: 'ci-cd.yml',
+              ref: 'main',
+              inputs: { environment: '${{ inputs.environment }}' }
+            })
+
+  # 3. Deploy Mobile App (Depends on Web)
+  deploy-mobile:
+    needs: deploy-web
+    name: Deploy Mobile App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Mobile Workflow
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'Car-Pooling-System',
+              repo: 'Car-Pooling-System-Mobile-Frontend',
+              workflow_id: 'ci-cd.yml',
+              ref: 'main',
+              inputs: { environment: '${{ inputs.environment }}' }
+            })
+
+  # 4. Run System Integration Tests
+  integration-test:
+    needs: [deploy-backend, deploy-web, deploy-mobile]
+    if: ${{ !inputs.skip_tests }}
+    name: Run System Integration Verified
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run Integration Suite
+        run: npm run test:integration
+        env:
+          API_URL: https://backend.railway.app
+          WEB_URL: https://carpooling.vercel.app

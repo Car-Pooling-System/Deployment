@@ -1,25 +1,32 @@
 # Troubleshooting Guide
 
-## Deployment Failures
+## Common Issues
 
-### Backend
-- **Issue**: Deployment hangs on "Building".
-- **Fix**: Check Dockerfile for large COPY operations. Ensure `.dockerignore` excludes `node_modules`.
+### 1. "Resource not accessible by integration"
+**Cause**: The `GH_PAT` token is missing, expired, or lacks permissions.
+**Fix**: 
+- Generate a new PAT with `repo` and `workflow` scopes.
+- Update `GH_PAT` in Repository Secrets.
 
-### Web Frontend
-- **Issue**: "Build folder not found".
-- **Fix**: Verify `vite.config.js` output directory matches Vercel settings (default `dist`).
+### 2. Backend Deployment Timeout
+**Cause**: Railway deployment took longer than the configured sleep time.
+**Fix**: 
+- Check Railway logs for build errors.
+- Increase the `sleep` duration in `deploy-all.yml`.
 
-### Mobile
-- **Issue**: "EAS project not found".
-- **Fix**: Run `eas build:configure` again and link `app.json` correctly.
+### 3. Mobile Build Failed
+**Cause**: `EXPO_TOKEN` invalid or missing in the Mobile repo secrets.
+**Fix**:
+- Renew token at expo.dev.
+- Update secret in `Car-Pooling-System-Mobile-Frontend` repo.
 
-## Runtime Issues
+### 4. Integration Tests Failing
+**Cause**: API or Web URL not reachable from GitHub Actions runner.
+**Fix**:
+- Verify the `API_URL` and `WEB_URL` environment variables match the deployed environment.
+- Check if the services are actually running.
 
-### CORS Errors
-- **Symptom**: Frontend cannot talk to Backend.
-- **Fix**: Update Backend `cors` configuration to include Frontend domains (`vercel.app`).
-
-### Database Connection
-- **Symptom**: API returns 500 errors on startup.
-- **Fix**: Verify `MONGODB_URI` environment variable in Railway dashboard.
+## Debugging Steps
+1. **Check Action Logs**: Expand the step that failed in GitHub Actions.
+2. **Verify Health**: Run `./scripts/health-check.sh` locally.
+3. **Isolate Service**: Try deploying the failing service manually from its own repository to see if the issue is local to that service.

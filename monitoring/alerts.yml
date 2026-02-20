@@ -1,0 +1,21 @@
+alerts:
+  channels:
+    - type: email
+      recipients: [admin@carpoolingsystem.org]
+    - type: slack
+      webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+  rules:
+    - name: High Latency
+      threshold: 1000ms
+      window: 5m
+      severity: warning
+    
+    - name: 5xx Error Rate
+      threshold: 1%
+      window: 1m
+      severity: critical
+    
+    - name: Health Check Failed
+      condition: status != 200
+      severity: critical

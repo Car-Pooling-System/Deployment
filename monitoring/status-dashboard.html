@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Pooling System Status</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; text-align: center; }
+        .status-card { border: 1px solid #ddd; padding: 20px; margin: 10px; border-radius: 8px; display: inline-block; width: 200px; }
+        .up { background-color: #d4edda; color: #155724; }
+        .down { background-color: #f8d7da; color: #721c24; }
+        h1 { margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+    <h1>System Status Dashboard</h1>
+    
+    <div id="backend" class="status-card">
+        <h3>Backend API</h3>
+        <p id="backend-status">Checking...</p>
+    </div>
+
+    <div id="web" class="status-card">
+        <h3>Web Frontend</h3>
+        <p id="web-status">Checking...</p>
+    </div>
+
+    <script>
+        async function checkStatus(url, elementId) {
+            try {
+                const response = await fetch(url, { mode: 'no-cors' }); 
+                // Note: no-cors mode limits access to status code, but success usually means server is reachable. 
+                // For meaningful checks, enable CORS on backend or use a proxy.
+                document.getElementById(elementId).innerText = "Operational";
+                document.getElementById(elementId).parentElement.className += " up";
+            } catch (error) {
+                document.getElementById(elementId).innerText = "Down/Unreachable";
+                document.getElementById(elementId).parentElement.className += " down";
+            }
+        }
+
+        checkStatus('https://backend.railway.app/health', 'backend-status');
+        checkStatus('https://carpooling.vercel.app', 'web-status');
+    </script>
+</body>
+</html>

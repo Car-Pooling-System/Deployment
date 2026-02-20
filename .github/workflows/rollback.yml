@@ -1,0 +1,32 @@
+name: Emergency Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to Rollback'
+        required: true
+        type: choice
+        options:
+          - all
+          - backend
+          - web
+          - mobile
+      reason:
+        description: 'Reason for rollback'
+        required: true
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Make script executable
+        run: chmod +x scripts/rollback.sh
+        
+      - name: Execute Rollback
+        run: ./scripts/rollback.sh "${{ inputs.service }}"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          REASON: ${{ inputs.reason }}

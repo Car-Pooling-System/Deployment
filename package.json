@@ -1,0 +1,26 @@
+{
+    "name": "carpooling-deployment",
+    "version": "1.0.0",
+    "description": "Deployment orchestrator for Car Pooling System",
+    "main": "index.js",
+    "scripts": {
+        "setup": "./scripts/setup-local.sh",
+        "deploy:staging": "./scripts/deploy-all.sh staging",
+        "deploy:prod": "./scripts/deploy-all.sh production",
+        "health-check": "./scripts/health-check.sh",
+        "test:integration": "jest tests/integration",
+        "test": "npm run test:integration"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Car-Pooling-System/deployment.git"
+    },
+    "author": "Car Pooling System Team",
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^1.6.0"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0"
+    }
+}

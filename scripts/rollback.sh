@@ -1,5 +1,18 @@
 #!/bin/bash
 
-echo "⚠️  Global Rollback Initiated"
-echo "NOTE: Automatic rollback requires specific provider configurations."
-echo "Please manually revert deployments via Railway/Vercel dashboards."
+# Rollback Script
+# Usage: ./rollback.sh [service]
+
+SERVICE=${1:-all}
+ORG="Car-Pooling-System"
+REPO="deployment"
+
+echo "⚠️  Initiating Rollback for: $SERVICE"
+
+gh workflow run rollback.yml \
+  --repo $ORG/$REPO \
+  --ref main \
+  -f service=$SERVICE \
+  -f reason="Manual Trigger via CLI"
+
+echo "Rollback workflow triggered."

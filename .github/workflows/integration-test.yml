@@ -2,19 +2,19 @@ name: Integration Tests
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *' # Daily at midnight
+  repository_dispatch:
+    types: [trigger-tests]
 
 jobs:
-  test:
+  system-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-      - name: Install Deps
-        run: cd tests && npm install
-      - name: Run Integration Suite
-        run: cd tests && npm test
+          node-version: '18'
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run Tests
+        run: npm test

@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Mac
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Environment variables
+.env
+SECRETS.md
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+dist/
+coverage/

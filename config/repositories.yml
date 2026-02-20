@@ -1,0 +1,24 @@
+repositories:
+  backend:
+    name: carpooling-backend
+    url: https://github.com/Car-Pooling-System/Car-Pooling-System-Backend
+    branch: main
+    tech_stack: Node.js 18, Express, MongoDB
+    deploy_url: https://backend.railway.app
+    health_endpoint: /health
+
+  frontend_web:
+    name: carpooling-frontend-web
+    url: https://github.com/Car-Pooling-System/Car-Pooling-System-Web-Frontend
+    branch: main
+    tech_stack: React 18, Vite
+    deploy_url: https://carpooling.vercel.app
+    health_endpoint: /
+
+  frontend_mobile:
+    name: carpooling-frontend-mobile
+    url: https://github.com/Car-Pooling-System/Car-Pooling-System-Mobile-Frontend
+    branch: main
+    tech_stack: React Native, Expo
+    deploy_url: exp://u.expo.dev/update/your-project-id
+    health_endpoint: null

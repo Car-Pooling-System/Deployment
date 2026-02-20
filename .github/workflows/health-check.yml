@@ -1,0 +1,34 @@
+name: System Health Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Run every 6 hours
+  workflow_dispatch:
+
+jobs:
+  check-health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Make script executable
+        run: chmod +x scripts/health-check.sh
+        
+      - name: Run Health Check Script
+        run: ./scripts/health-check.sh
+        env:
+          BACKEND_URL: https://backend.railway.app
+          WEB_URL: https://carpooling.vercel.app
+      
+      - name: Send Alert on Failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Example: Create an issue or send notification
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Health Check Failed',
+              body: 'The system health check failed. verify the logs.'
+            })
