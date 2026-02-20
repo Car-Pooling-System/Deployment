@@ -1,30 +1,41 @@
-# Secrets & Configuration Guide
+# 🔐 Master Secrets & Configuration Guide
 
-To enable the full CI/CD pipeline, you must configure secrets in each repository.
+To enable the full CI/CD pipeline, you must configure GitHub Secrets in each repository's settings (**Settings > Secrets and variables > Actions**).
+
+---
 
 ## 1. Orchestrator Repo (`carpooling-deployment`)
-**Required Secret:**
-- `GH_PAT`: A GitHub Personal Access Token with `repo` and `workflow` scopes.
-  - **Purpose**: Allows the orchestrator to trigger workflows in other repositories.
-  - **Creation**: [GitHub Settings > Developer Settings > PATs](https://github.com/settings/tokens/new)
+**Critical for cross-repo triggers:**
+- `GH_PAT`: A GitHub **Personal Access Token** (Classic).
+  - **Required Scopes**: `repo`, `workflow`.
+  - **Why?**: This token allows the Orchestrator to trigger the CI/CD workflows in your Backend, Web, and Mobile repos.
+  - **Error Fix**: If you see `Bad credentials`, your token is either expired or missing the `workflow` scope.
 
-## 2. Mobile Repo (`Car-Pooling-System-Mobile-Frontend`)
-**Required Secret:**
-- `EXPO_TOKEN`: Your Expo Access Token.
-  - **Purpose**: Allows EAS Build/Update to publish your app.
-  - **Creation**: [Expo Dashboard > Access Tokens](https://expo.dev/settings/access-tokens)
+---
 
-## 3. Backend Repo (`Car-Pooling-System-Backend`)
-**Optional Secrets (for automated deployment):**
-- `RAILWAY_TOKEN`: If using Railway CLI for deployment (currently using git-push).
-- `MONGODB_URI`: Connection string for integration tests (if running against real DB).
-- `JWT_SECRET`: Secret key for signing tokens during tests.
+## 2. Backend Repo (`Car-Pooling-System-Backend`)
+- `JWT_SECRET`: Secret key for signing authentication tokens.
+- `MONGODB_URI`: (Optional) If you want integration tests to run against a real database instead of the Docker service.
 
-## 4. Web Repo (`Car-Pooling-System-Web-Frontend`)
-**Optional Secrets (for automated deployment):**
-- `VERCEL_TOKEN`: If using Vercel CLI for deployment (currently using git-push).
+---
 
-## JSON Configuration
-The `config/` folder contains service-specific settings:
-- `backend.json`: API URL and health check path.
-- `frontend-web.json`: Web URL.
+## 3. Web Repo (`Car-Pooling-System-Web-Frontend`)
+- `VERCEL_TOKEN`: Required if you use the Vercel CLI for deployment.
+- `VERCEL_ORG_ID`: Required for Vercel CLI.
+- `VERCEL_PROJECT_ID`: Required for Vercel CLI.
+- *Note*: If you linked Vercel to GitHub directly, these might not be needed for basic auto-deploy, but are good for advanced control.
+
+---
+
+## 4. Mobile Repo (`Car-Pooling-System-Mobile-Frontend`)
+- `EXPO_TOKEN`: **Mandatory**. Your Expo Access Token.
+  - **Creation**: [Expo Dashboard > Access Tokens](https://expo.dev/settings/access-tokens).
+  - **Why?**: Allows GitHub to build and publish your app to Expo.
+
+---
+
+## 💡 How Workflows Interact
+1. **Orchestrator** triggers child workflows via GitHub API (using `GH_PAT`).
+2. **Child Workflow** runs locally in its repo (lint, test, build).
+3. **Child Workflow** deploys to its provider (Railway, Vercel, Expo) using its own secrets.
+
