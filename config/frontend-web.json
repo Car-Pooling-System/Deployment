@@ -1,0 +1,6 @@
+{
+    "serviceName": "Web Frontend",
+    "url": "https://carpooling.vercel.app",
+    "healthPath": "/",
+    "docsUrl": "https://github.com/Car-Pooling-System/Car-Pooling-System-Web-Frontend"
+}

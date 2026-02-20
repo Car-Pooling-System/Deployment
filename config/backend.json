@@ -1,0 +1,6 @@
+{
+    "serviceName": "Backend API",
+    "url": "https://backend.railway.app",
+    "healthPath": "/health",
+    "docsUrl": "https://github.com/Car-Pooling-System/Car-Pooling-System-Backend"
+}
