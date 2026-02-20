@@ -1,4 +1,4 @@
-# 🔐 Master Secrets & Configuration Guide
+#  Master Secrets & Configuration Guide
 
 To enable the full CI/CD pipeline, you must configure GitHub Secrets in each repository's settings (**Settings > Secrets and variables > Actions**).
 
